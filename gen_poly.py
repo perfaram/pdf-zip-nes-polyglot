@@ -186,7 +186,9 @@ def main():
 			
 			new_message = message_command.encode('utf-8') + message_bytes + "\n".encode('utf-8')
 			outfile.write(new_message)
-			offset += len(new_message)
+			message_len = len(new_message)
+			print("The ASCII art begins @" + str(offset) + " and lasts " + str(message_len) + " bytes")
+			offset += message_len
 			print("ZIP file will have its offsets off by " + str(offset) + " bytes")
 
 		with InMemoryZipFile() as memzip:
