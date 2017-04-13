@@ -172,6 +172,21 @@ def main():
 		with open(in_path, 'rb') as infile:
 			offset += filelike_size(infile)
 			shutil.copyfileobj(infile, outfile)
+
+		with open(message_path, 'rb') as message_file:
+			message_bytes = message_file.read()
+
+			#WARNING
+			#this is notoriously suboptimal, as we may very well have an issue when adding a number (eg 9 to 10, 99 to 100)
+			#therefore, we add a useless linebreak at the end of the message (so that if the last char gets cut, it didn't matter anyway)
+			len_msg_comm = len(gen_message_append_command(start_offset = offset, length = len(message_bytes) + 24, filename = path_leaf(out_path)))
+			#minimum overhead of the command string ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+			message_command = gen_message_append_command(start_offset = offset, length = len(message_bytes) + 1 + len_msg_comm, filename = path_leaf(out_path)) 
+			#notice the "+1" there ? This is to account for the additional linebreak     ->~~~~~~~~~~~~~~~~~~>^
+			
+			new_message = message_command.encode('utf-8') + message_bytes + "\n".encode('utf-8')
+			outfile.write(new_message)
+			offset += len(new_message)
 			print("ZIP file will have its offsets off by " + str(offset) + " bytes")
 
 		with InMemoryZipFile() as memzip:
@@ -179,24 +194,6 @@ def main():
 				memzip.append(file_to_zip, compress_type=zipfile.ZIP_DEFLATED) #deflated
 			size_of_zipped = filelike_size(memzip.in_memory_data)
 			offset += size_of_zipped
-
-			memzip.append(message_path, compress_type=zipfile.ZIP_STORED)
-			with open(message_path, 'rb') as message_file:
-				message_bytes = message_file.read()
-				message_file_name = path_leaf(message_path)
-				zip_const_overhead = 30 + len(message_file_name) + 1
-				offset += zip_const_overhead
-				memzip.delete(message_path)
-
-				#WARNING
-				#this is notoriously suboptimal, as we may very well have an issue when adding a number (eg 9 to 10, 99 to 100)
-				#therefore, we add a useless linebreak at the end of the message (so that if the last char gets cut, it didn't matter anyway)
-				len_msg_comm = len(gen_message_append_command(start_offset = offset, length = len(message_bytes) + 22, filename = path_leaf(out_path)))
-				message_command = gen_message_append_command(start_offset = offset, length = len(message_bytes) + 1 + len_msg_comm, filename = path_leaf(out_path)) 
-				#notice the "+1" there ? This is to account for the additional linebreak     ->~~~~~~~~~~~~~~~~~~>^
-				new_message = message_command.encode('utf-8') + message_bytes + "\n".encode('utf-8') 
-
-				memzip.appendStr(path_leaf(message_path), new_message, compress_type=zipfile.ZIP_STORED)
 
 			outfile.write(memzip.close_and_return_data())
 
