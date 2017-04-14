@@ -147,11 +147,12 @@ class InMemoryZipFile(object):
 
 
 
-parser = argparse.ArgumentParser(description='Generate a ZIP/PDF polyglot file, with a cleartext message embedded in a JPG file, and append the instructions to output this message directly using head/tail.')
+parser = argparse.ArgumentParser(description='Generate a ZIP/PDF/Whatever polyglot file, with a cleartext message embedded (and instructions to output this message included). The `whatever` may be, for instance, a NES game file - it is added before the PDF.')
 parser.add_argument('--out', dest='out_path', action='store', help='set the path of the resulting file', required=True)
 parser.add_argument('--in', dest='in_path', action='store', help='path of the PDF to which to append', required=True)
 parser.add_argument('--zip', dest='zip_array', action='store', nargs='+', help='path(s) to the file(s) going to be zipped and included in the PDF', required=True)
 parser.add_argument('--message', dest='message_path', action='store', help='path to the plaintext file', required=True)
+parser.add_argument('--header', dest='header_path', action='store', help='path to the header file, that will be added before the PDF', required=True)
 
 def main():
 	args = parser.parse_args()
@@ -161,6 +162,7 @@ def main():
 	in_path = args.in_path
 	zip_array = args.zip_array
 	message_path = args.message_path
+	header_path = args.header_path
 
 	if os.path.exists(out_path):
 		errprint("File " + out_path + " ALREADY EXISTS, gonna overwrite !!!!!!!")
@@ -169,6 +171,10 @@ def main():
 	offset = 0
 
 	with open(tempout_path, 'xb') as outfile:
+		with open(header_path, 'rb') as headerfile:
+			offset += filelike_size(headerfile)
+			shutil.copyfileobj(headerfile, outfile)
+
 		with open(in_path, 'rb') as infile:
 			offset += filelike_size(infile)
 			shutil.copyfileobj(infile, outfile)
