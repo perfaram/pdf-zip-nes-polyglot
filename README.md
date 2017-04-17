@@ -1,15 +1,23 @@
-# PDF-ZIP polyglot file generator
+# PDF-ZIP-NES polyglot file generator
 Run with (using the included sample files) : 
 ```
-./gen_poly.py --out magic.pdf --in "CAMUS, Albert - The Stranger.pdf" --message monalisa_joconde_ascii.txt --zip hyeronimus_bosch.jpg
+./gen_poly.py --out magic.pdf --in "CAMUS, Albert - The Stranger.pdf" --message monalisa_joconde_ascii.txt --zip hyeronimus_bosch.jpg --header sample.nes
 ```
 
-This will output a file that : 
-1. Is a valid PDF file (will display *The Stranger*, by Camus, when you open it)
-2. Is a valid ZIP file (will unzip to a famous painting by Hyeronimus Bosch)
-3. Will display a splendid rendition of the Mona Lisa in ASCII, when run thru `cat`
-4. Also includes, just before the ASCII art, the command which is to be run to directly output this painting (without the surrounding gibberish)
+Let's break this up : 
+* `--out` is the path/name of the resulting file, that will be a perfectly valid PDF file, that could be opened in any PDF viewer
+* `--in` is your original PDF file
+	$ in my example : *The Stranger*, by Camus
+* `--message` is the plaintext message that should appear when the resulting file will be opened in a hex editor, or directly `cat`-ed in a terminal
+	* in my example : a splendid rendition of the Mona Lisa in ASCII
+	* additional feature : a command to directly output this message (and **only** this message without any surrounding gibberish) will be added just before the message itself
+* `--zip` is the (list of) file(s) that are to be zipped and appended in the original PDF
+	* in my example : a famous painting by Hyeronimus Bosch
+	* additional feature : when unzipped, the original PDF will also appear, *although it is not duplicated in the resulting file* – ain't this magic :)
+* `--header` is the file that is to be included at the beginning of the file, before the PDF itself
+	* in my example : a NES game, for emulators. So that you can also the PDF in an emulator !
 
-However, the ASCII art being in the middle of the file, it is unlikely you'll see it. I’m working on a workaround (by hiding it in the beginning of the PDF itself).
+Still, with all this stuff appended to and included at the beginning of the PDF, it stays valid and viewable in any standard PDF viewer (such as Adobe Reader, Preview on macOS, etc...)
+All of this is possible thanks to the fact that the PDF header does not have to be at the beginning of the file, for it to be a valid PDF.
 
-**Inspired by PoC||GTFO-0x14**, though this would seem very basic to them.
+**Inspired by PoC||GTFO-0x14**, though this would seem very basic to @angea

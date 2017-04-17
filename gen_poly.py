@@ -175,9 +175,9 @@ def main():
 			offset += filelike_size(headerfile)
 			shutil.copyfileobj(headerfile, outfile)
 
-		with open(in_path, 'rb') as infile:
-			offset += filelike_size(infile)
-			shutil.copyfileobj(infile, outfile)
+		#with open(in_path, 'rb') as infile:
+		#	offset += filelike_size(infile)
+		#	shutil.copyfileobj(infile, outfile)
 
 		with open(message_path, 'rb') as message_file:
 			message_bytes = message_file.read()
@@ -198,6 +198,7 @@ def main():
 			print("ZIP file will have its offsets off by " + str(offset) + " bytes")
 
 		with InMemoryZipFile() as memzip:
+			memzip.append(in_path, compress_type=zipfile.ZIP_STORED)
 			for file_to_zip in zip_array:
 				memzip.append(file_to_zip, compress_type=zipfile.ZIP_DEFLATED) #deflated
 			size_of_zipped = filelike_size(memzip.in_memory_data)
