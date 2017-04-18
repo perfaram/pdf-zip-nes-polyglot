@@ -5,12 +5,13 @@ Run with (using the included sample files) :
 ```
 
 Let's break this up : 
-* `--out` is the path/name of the resulting file, that will be a perfectly valid PDF file, that could be opened in any PDF viewer
+* `--out` is the path/name of the resulting file – which will be a perfectly valid PDF file
 * `--in` is your original PDF file
-	$ in my example : *The Stranger*, by Camus
+	* in my example : *The Stranger*, by Camus
 * `--message` is the plaintext message that should appear when the resulting file will be opened in a hex editor, or directly `cat`-ed in a terminal
 	* in my example : a splendid rendition of the Mona Lisa in ASCII
 	* additional feature : a command to directly output this message (and **only** this message without any surrounding gibberish) will be added just before the message itself
+		* this command looks like <code>tail -c +<strong>offset of message in file</strong> magic.pdf | head -c <strong>length of message</strong></code>
 * `--zip` is the (list of) file(s) that are to be zipped and appended in the original PDF
 	* in my example : a famous painting by Hyeronimus Bosch
 	* additional feature : when unzipped, the original PDF will also appear, *although it is not duplicated in the resulting file* – ain't this magic :)
